@@ -1,0 +1,77 @@
+{
+  "name": "classic-asp-formatter",
+  "displayName": "Classic ASP Formatter",
+  "description": "A formatter for Classic ASP files",
+  "version": "0.0.1",
+  "publisher": "Ashton Chew",
+  "engines": {
+    "vscode": "^1.108.1"
+  },
+  "categories": [
+    "Formatters"
+  ],
+  "activationEvents": [
+    "onLanguage:asp"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "asp",
+        "aliases": ["ASP", "asp"],
+        "extensions": [".asp"],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "configuration": {
+      "title": "Classic ASP Formatter",
+      "properties": {
+        "aspFormatter.keywordCase": {
+          "type": "string",
+          "default": "PascalCase",
+          "enum": ["lowercase", "UPPERCASE", "PascalCase"],
+          "enumDescriptions": [
+            "Format keywords in lowercase (if, then, end if, dim)",
+            "Format keywords in UPPERCASE (IF, THEN, END IF, DIM)",
+            "Format keywords in PascalCase (If, Then, End If, Dim)"
+          ],
+          "description": "Choose how VBScript keywords should be formatted. Note: ASP objects (Response, Request, etc.) are always formatted in PascalCase."
+        },
+        "aspFormatter.indentStyle": {
+          "type": "string",
+          "default": "spaces",
+          "enum": ["spaces", "tabs"],
+          "enumDescriptions": [
+            "Use spaces for indentation",
+            "Use tabs for indentation"
+          ],
+          "description": "Choose between spaces or tabs for indentation"
+        },
+        "aspFormatter.indentSize": {
+          "type": "number",
+          "default": 4,
+          "enum": [2, 4, 8],
+          "description": "Number of spaces per indentation level (only applies when using spaces)"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.108.1",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "typescript-eslint": "^8.52.0",
+    "eslint": "^9.39.2",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.12",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
