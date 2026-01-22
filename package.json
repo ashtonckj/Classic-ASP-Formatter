@@ -1,11 +1,11 @@
 {
   "name": "classic-asp-formatter",
   "displayName": "Classic ASP Formatter",
-  "description": "A formatter for Classic ASP files",
+  "description": "A comprehensive formatter for Classic ASP files with HTML, CSS, JavaScript, and VBScript support.",
   "version": "0.0.1",
-  "publisher": "Ashton Chew",
+  "publisher": "ashtonckj",
   "engines": {
-    "vscode": "^1.108.1"
+    "vscode": "^1.80.0"
   },
   "categories": [
     "Formatters"
@@ -18,8 +18,13 @@
     "languages": [
       {
         "id": "asp",
-        "aliases": ["ASP", "asp"],
-        "extensions": [".asp"],
+        "aliases": [
+          "ASP",
+          "asp"
+        ],
+        "extensions": [
+          ".asp"
+        ],
         "configuration": "./language-configuration.json"
       }
     ],
@@ -29,7 +34,11 @@
         "aspFormatter.keywordCase": {
           "type": "string",
           "default": "PascalCase",
-          "enum": ["lowercase", "UPPERCASE", "PascalCase"],
+          "enum": [
+            "lowercase",
+            "UPPERCASE",
+            "PascalCase"
+          ],
           "enumDescriptions": [
             "Format keywords in lowercase (if, then, end if, dim)",
             "Format keywords in UPPERCASE (IF, THEN, END IF, DIM)",
@@ -40,7 +49,10 @@
         "aspFormatter.indentStyle": {
           "type": "string",
           "default": "spaces",
-          "enum": ["spaces", "tabs"],
+          "enum": [
+            "spaces",
+            "tabs"
+          ],
           "enumDescriptions": [
             "Use spaces for indentation",
             "Use tabs for indentation"
@@ -50,8 +62,63 @@
         "aspFormatter.indentSize": {
           "type": "number",
           "default": 4,
-          "enum": [2, 4, 8],
+          "enum": [
+            2,
+            4,
+            8
+          ],
           "description": "Number of spaces per indentation level (only applies when using spaces)"
+        },
+        "aspFormatter.prettier.printWidth": {
+          "type": "number",
+          "default": 80,
+          "description": "Prettier Setting: Maximum line length for HTML/CSS/JS code",
+          "order": 4
+        },
+        "aspFormatter.prettier.tabWidth": {
+          "type": "number",
+          "default": 4,
+          "enum": [
+            2,
+            4,
+            8
+          ],
+          "description": "Prettier Setting: Number of spaces per indentation level for HTML/CSS/JS code",
+          "order": 5
+        },
+        "aspFormatter.prettier.useTabs": {
+          "type": "boolean",
+          "default": false,
+          "description": "Prettier Setting: Use tabs instead of spaces for HTML/CSS/JS code",
+          "order": 6
+        },
+        "aspFormatter.prettier.semi": {
+          "type": "boolean",
+          "default": true,
+          "description": "Prettier Setting: Add semicolons at the end of JavaScript statements",
+          "order": 7
+        },
+        "aspFormatter.prettier.singleQuote": {
+          "type": "boolean",
+          "default": false,
+          "description": "Prettier Setting: Use single quotes instead of double quotes in JavaScript",
+          "order": 8
+        },
+        "aspFormatter.prettier.htmlWhitespaceSensitivity": {
+          "type": "string",
+          "default": "css",
+          "enum": [
+            "css",
+            "strict",
+            "ignore"
+          ],
+          "enumDescriptions": [
+            "Respect CSS display property defaults",
+            "Whitespace is considered significant",
+            "Whitespace is considered insignificant"
+          ],
+          "description": "Prettier Setting: How to handle whitespace in HTML",
+          "order": 9
         }
       }
     }
@@ -61,17 +128,19 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src",
-    "test": "vscode-test"
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "dependencies": {
+    "prettier": "^3.8.1"
   },
   "devDependencies": {
-    "@types/vscode": "^1.108.1",
     "@types/mocha": "^10.0.10",
-    "@types/node": "22.x",
-    "typescript-eslint": "^8.52.0",
-    "eslint": "^9.39.2",
-    "typescript": "^5.9.3",
-    "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^2.5.2"
+    "@types/node": "16.x",
+    "@types/vscode": "^1.80.0",
+    "@typescript-eslint/eslint-plugin": "^8.53.1",
+    "@typescript-eslint/parser": "^8.53.1",
+    "eslint": "^8.41.0",
+    "typescript": "^5.0.4"
   }
 }

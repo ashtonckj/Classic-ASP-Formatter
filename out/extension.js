@@ -36,15 +36,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.activate = activate;
 exports.deactivate = deactivate;
 const vscode = __importStar(require("vscode"));
+const prettier = __importStar(require("prettier"));
 // This function is called when your extension is activated
 function activate(context) {
     console.log('ASP Code Formatter is now active!');
     // Register the formatter for .asp files
     const formatter = vscode.languages.registerDocumentFormattingEditProvider('asp', {
-        provideDocumentFormattingEdits(document) {
+        async provideDocumentFormattingEdits(document) {
             const edits = [];
             const fullText = document.getText();
-            const formattedText = formatAspCode(fullText);
+            const formattedText = await formatCompleteAspFile(fullText);
             // Replace the entire document with formatted text
             const fullRange = new vscode.Range(document.positionAt(0), document.positionAt(fullText.length));
             edits.push(vscode.TextEdit.replace(fullRange, formattedText));
@@ -57,61 +58,151 @@ function activate(context) {
 function getSettings() {
     const config = vscode.workspace.getConfiguration('aspFormatter');
     return {
+        // ASP settings
         keywordCase: config.get('keywordCase', 'PascalCase'),
         indentStyle: config.get('indentStyle', 'spaces'),
-        indentSize: config.get('indentSize', 4)
+        indentSize: config.get('indentSize', 4),
+        // Prettier settings
+        prettier: {
+            printWidth: config.get('prettier.printWidth', 80),
+            tabWidth: config.get('prettier.tabWidth', 2),
+            useTabs: config.get('prettier.useTabs', false),
+            semi: config.get('prettier.semi', true),
+            singleQuote: config.get('prettier.singleQuote', false),
+            htmlWhitespaceSensitivity: config.get('prettier.htmlWhitespaceSensitivity', 'css')
+        }
     };
 }
-// Main formatting function
-function formatAspCode(code) {
+// Main function: Format complete ASP file with HTML, CSS, JS, and ASP code
+async function formatCompleteAspFile(code) {
     const settings = getSettings();
-    const lines = code.split('\n');
+    // Step 1: Extract and mask ASP blocks
+    const aspBlocks = [];
+    const maskedCode = code.replace(/^([ \t]*)(<%[\s\S]*?%>)/gm, (match, indent, aspBlock) => {
+        const index = aspBlocks.length;
+        aspBlocks.push({ code: aspBlock, indent: indent });
+        return indent + `___ASP_BLOCK_${index}___`;
+    });
+    // Step 2: Format HTML/CSS/JS with Prettier
+    let prettifiedCode;
+    try {
+        const formatted = await prettier.format(maskedCode, {
+            parser: 'html',
+            printWidth: settings.prettier.printWidth,
+            tabWidth: settings.prettier.tabWidth,
+            useTabs: settings.prettier.useTabs,
+            semi: settings.prettier.semi,
+            singleQuote: settings.prettier.singleQuote,
+            htmlWhitespaceSensitivity: settings.prettier.htmlWhitespaceSensitivity,
+            endOfLine: 'lf'
+        });
+        prettifiedCode = formatted;
+    }
+    catch (error) {
+        console.error('Prettier formatting failed:', error);
+        prettifiedCode = maskedCode; // Fallback to masked code if Prettier fails
+    }
+    // Step 3: Format each ASP block and restore them with proper indentation
+    let restoredCode = prettifiedCode;
+    aspBlocks.forEach((block, index) => {
+        // Get the current indentation of the placeholder in the prettified code
+        const placeholderRegex = new RegExp(`^([ \\t]*)___ASP_BLOCK_${index}___`, 'm');
+        const match = restoredCode.match(placeholderRegex);
+        const htmlIndent = match ? match[1] : '';
+        // Format the ASP block with the HTML indentation
+        const formattedBlock = formatSingleAspBlock(block.code, settings, htmlIndent);
+        // Replace placeholder with formatted block
+        restoredCode = restoredCode.replace(new RegExp(`^[ \\t]*___ASP_BLOCK_${index}___`, 'm'), formattedBlock);
+    });
+    return restoredCode;
+}
+// Format a single ASP block (either <% ... %> or <%= ... %>)
+function formatSingleAspBlock(block, settings, htmlIndent = '') {
+    // Check if it's an inline expression <%= %>
+    if (block.trim().startsWith('<%=')) {
+        // Format inline expression: <%= variable %>
+        const content = block.substring(3, block.length - 2).trim();
+        const formattedContent = applyKeywordCase(content, settings.keywordCase);
+        return '<%= ' + formattedContent + ' %>';
+    }
+    // Check if it's a single-line block
+    if (!block.includes('\n')) {
+        // Single line: <% code %>
+        const content = block.substring(2, block.length - 2).trim();
+        const formattedContent = applyKeywordCase(content, settings.keywordCase);
+        return '<% ' + formattedContent + ' %>';
+    }
+    // Multi-line block: format with indentation
+    return formatMultiLineAspBlock(block, settings, htmlIndent);
+}
+// Format multi-line ASP block
+function formatMultiLineAspBlock(block, settings, htmlIndent = '') {
+    const lines = block.split('\n');
     const formattedLines = [];
-    let insideAspBlock = false;
     let aspIndentLevel = 0;
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i];
         const trimmedLine = line.trim();
-        // Check if entering ASP block
-        if (trimmedLine.startsWith('<%') && !trimmedLine.includes('%>')) {
-            insideAspBlock = true;
-            aspIndentLevel = 0;
-            formattedLines.push('<%');
+        // Opening tag
+        if (trimmedLine === '<%' || trimmedLine.startsWith('<%')) {
+            if (trimmedLine === '<%') {
+                formattedLines.push(htmlIndent + '<%');
+                continue;
+            }
+            // Single line after <%
+            const content = trimmedLine.substring(2).trim();
+            if (content) {
+                const indentChange = getIndentChange(content);
+                if (indentChange.before < 0) {
+                    aspIndentLevel = Math.max(0, aspIndentLevel + indentChange.before);
+                }
+                const aspIndent = getIndentString(aspIndentLevel, settings.indentStyle, settings.indentSize);
+                const formattedContent = applyKeywordCase(content, settings.keywordCase);
+                formattedLines.push(htmlIndent + aspIndent + formattedContent);
+                if (indentChange.after > 0) {
+                    aspIndentLevel += indentChange.after;
+                }
+            }
             continue;
         }
-        // Check if exiting ASP block
-        if (insideAspBlock && trimmedLine === '%>') {
-            insideAspBlock = false;
-            formattedLines.push('%>');
+        // Closing tag
+        if (trimmedLine === '%>' || trimmedLine.endsWith('%>')) {
+            if (trimmedLine === '%>') {
+                formattedLines.push(htmlIndent + '%>');
+                continue;
+            }
+            // Code before %>
+            const content = trimmedLine.substring(0, trimmedLine.length - 2).trim();
+            if (content) {
+                const indentChange = getIndentChange(content);
+                if (indentChange.before < 0) {
+                    aspIndentLevel = Math.max(0, aspIndentLevel + indentChange.before);
+                }
+                const aspIndent = getIndentString(aspIndentLevel, settings.indentStyle, settings.indentSize);
+                const formattedContent = applyKeywordCase(content, settings.keywordCase);
+                formattedLines.push(htmlIndent + aspIndent + formattedContent);
+                if (indentChange.after > 0) {
+                    aspIndentLevel += indentChange.after;
+                }
+            }
+            formattedLines.push(htmlIndent + '%>');
             continue;
         }
-        // Check for single-line ASP blocks (like <% x = 1 %>)
-        if (trimmedLine.startsWith('<%') && trimmedLine.endsWith('%>')) {
-            const aspCode = trimmedLine.substring(2, trimmedLine.length - 2).trim();
-            const formattedCode = applyKeywordCase(aspCode, settings.keywordCase);
-            formattedLines.push('<% ' + formattedCode + ' %>');
-            continue;
-        }
-        // Format lines inside ASP block
-        if (insideAspBlock) {
+        // Regular line inside ASP block
+        if (trimmedLine) {
             const indentChange = getIndentChange(trimmedLine);
-            // Decrease indent BEFORE formatting (for closing keywords)
             if (indentChange.before < 0) {
                 aspIndentLevel = Math.max(0, aspIndentLevel + indentChange.before);
             }
-            // Format the line with current indent and keyword case
-            const indent = getIndentString(aspIndentLevel, settings.indentStyle, settings.indentSize);
-            const formattedCode = applyKeywordCase(trimmedLine, settings.keywordCase);
-            const formattedLine = indent + formattedCode;
-            formattedLines.push(formattedLine);
-            // Increase indent AFTER formatting (for opening keywords)
+            const aspIndent = getIndentString(aspIndentLevel, settings.indentStyle, settings.indentSize);
+            const formattedContent = applyKeywordCase(trimmedLine, settings.keywordCase);
+            formattedLines.push(htmlIndent + aspIndent + formattedContent);
             if (indentChange.after > 0) {
                 aspIndentLevel += indentChange.after;
             }
         }
         else {
-            // Outside ASP block - just preserve HTML/CSS/JS (clean trailing spaces)
-            formattedLines.push(line.trimEnd());
+            formattedLines.push('');
         }
     }
     return formattedLines.join('\n');
@@ -132,7 +223,7 @@ function formatOperators(code) {
         { pattern: /\s*=\s*/g, replacement: ' = ' }, // x=1 → x = 1
         { pattern: /\s*<>\s*/g, replacement: ' <> ' }, // x<>1 → x <> 1
         { pattern: /\s*\+\s*/g, replacement: ' + ' }, // x+1 → x + 1
-        { pattern: /\s*-\s*/g, replacement: ' - ' }, // x-1 → x - 1 (but not in negative numbers)
+        { pattern: /\s*-\s*/g, replacement: ' - ' }, // x-1 → x - 1
         { pattern: /\s*\*\s*/g, replacement: ' * ' }, // x*2 → x * 2
         { pattern: /\s*\/\s*/g, replacement: ' / ' }, // x/2 → x / 2
         { pattern: /\s*&\s*/g, replacement: ' & ' }, // "a"&"b" → "a" & "b"
