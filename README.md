@@ -1,71 +1,156 @@
-# classic-asp-formatter README
+# ASP Code Formatter
 
-This is the README for your extension "classic-asp-formatter". After writing up a brief description, we recommend including the following sections.
+A comprehensive code formatter for Classic ASP files that formats VBScript, HTML, CSS, and JavaScript all in one place.
 
-## Features
+## ✨ Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- **Multi-Language Formatting**: Formats Classic ASP (VBScript), HTML, CSS, and JavaScript in a single file
+- **Smart ASP Formatting**: Intelligent indentation for VBScript control structures (If/For/While/Select Case)
+- **Prettier Integration**: Professional HTML, CSS, and JavaScript formatting powered by Prettier
+- **Customizable Keyword Case**: Format VBScript keywords in lowercase, UPPERCASE, or PascalCase
+- **Flexible Indentation**: Choose between spaces or tabs, with configurable indent sizes
+- **Operator Spacing**: Automatically adds proper spacing around operators (=, +, -, *, etc.)
+- **Inline ASP Support**: Handles both multi-line `<% %>` blocks and inline `<%= %>` expressions
 
-For example if there is an image subfolder under your extension project workspace:
+## 🚀 Installation
 
-\!\[feature X\]\(images/feature-x.png\)
+1. Install from VS Code Extensions Marketplace (search for "ASP Code Formatter")
+2. Or install from `.vsix` file: Extensions → Install from VSIX
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## 📖 Usage
 
-## Requirements
+1. Open any `.asp` file
+2. Press `Alt + Shift + F` (Windows/Linux) or `Option + Shift + F` (Mac)
+3. Your code is formatted instantly!
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+### Before:
+```asp
+<!DOCTYPE html><html><body>
+<div><h1>Welcome <%=username%>!</h1>
+<%
+dim age
+age=request.form("age")
+if age>=18 then
+response.write("adult")
+end if
+%>
+</div></body></html>
+```
 
-## Extension Settings
+### After:
+```asp
+<!DOCTYPE html>
+<html>
+  <body>
+    <div>
+      <h1>Welcome <%= username %>!</h1>
+      <%
+      Dim age
+      age = Request.Form("age")
+      If age >= 18 Then
+          Response.Write("adult")
+      End If
+      %>
+    </div>
+  </body>
+</html>
+```
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+## ⚙️ Settings
 
-For example:
+Access settings via `File → Preferences → Settings` and search for "ASP Formatter".
 
-This extension contributes the following settings:
+### ASP (VBScript) Settings
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+| Setting | Default | Options | Description |
+|---------|---------|---------|-------------|
+| `aspFormatter.keywordCase` | `PascalCase` | `lowercase`, `UPPERCASE`, `PascalCase` | How to format VBScript keywords |
+| `aspFormatter.indentStyle` | `spaces` | `spaces`, `tabs` | Indentation style for ASP code |
+| `aspFormatter.indentSize` | `4` | `2`, `4`, `8` | Number of spaces per indent level |
 
-## Known Issues
+### Prettier (HTML/CSS/JS) Settings
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+| Setting | Default | Description |
+|---------|---------|-------------|
+| `aspFormatter.prettier.printWidth` | `80` | Maximum line length |
+| `aspFormatter.prettier.tabWidth` | `2` | Spaces per indentation level |
+| `aspFormatter.prettier.useTabs` | `false` | Use tabs instead of spaces |
+| `aspFormatter.prettier.semi` | `true` | Add semicolons in JavaScript |
+| `aspFormatter.prettier.singleQuote` | `false` | Use single quotes in JavaScript |
 
-## Release Notes
+### Example Configuration
 
-Users appreciate release notes as you update your extension.
+```json
+{
+  "aspFormatter.keywordCase": "PascalCase",
+  "aspFormatter.indentStyle": "spaces",
+  "aspFormatter.indentSize": 4,
+  "aspFormatter.prettier.tabWidth": 2,
+  "aspFormatter.prettier.semi": true
+}
+```
 
-### 1.0.0
+## 🎯 What Gets Formatted
 
-Initial release of ...
+### VBScript Keywords
+Control structures (`If`, `For`, `While`, `Select Case`), declarations (`Dim`, `Const`), functions (`Sub`, `Function`), and more.
 
-### 1.0.1
+### ASP Objects
+`Response`, `Request`, `Server`, `Session`, `Application` and their methods are always formatted in PascalCase.
 
-Fixed issue #.
+### HTML, CSS, JavaScript
+Formatted using Prettier with customizable settings for professional code style.
 
-### 1.1.0
+### Operators
+Automatic spacing around operators: `x=1` → `x = 1`, `"a"&"b"` → `"a" & "b"`
 
-Added features X, Y, and Z.
+## 🛠️ Development
+
+### Prerequisites
+- Node.js 16.x or higher
+- Visual Studio Code 1.80.0 or higher
+
+### Building from Source
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/asp-code-formatter.git
+cd asp-code-formatter
+
+# Install dependencies
+npm install
+
+# Compile TypeScript
+npm run compile
+
+# Run extension in debug mode
+# Press F5 in VS Code
+```
+
+## 📝 Known Limitations
+
+- ASP blocks must be properly closed (`<% ... %>`)
+- Complex mixed HTML/ASP structures may require manual adjustment
+- Prettier settings only apply to HTML/CSS/JS, not VBScript
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details
+
+## 🙏 Acknowledgments
+
+- **Prettier** - HTML, CSS, and JavaScript formatting engine
+- **Classic ASP Syntaxes and Snippets** by Jintae Joo - Inspiration for ASP language support
+- VS Code Extension API documentation and community
+
+## 📮 Support
+
+If you encounter any issues or have suggestions, please [open an issue](https://github.com/yourusername/asp-code-formatter/issues) on GitHub.
 
 ---
 
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+Made with ❤️ for the Classic ASP community
