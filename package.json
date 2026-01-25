@@ -1,150 +1,235 @@
 {
-  "name": "classic-asp-formatter",
-  "displayName": "Classic ASP Formatter",
-  "description": "A comprehensive formatter for Classic ASP files with HTML, CSS, JavaScript, and VBScript support.",
-  "version": "0.0.1",
-  "publisher": "ashtonckj",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ashtonckj/Classic-ASP-Formatter.git"
-  },
-  "engines": {
-    "vscode": "^1.80.0"
-  },
-  "categories": [
-    "Formatters"
-  ],
-  "activationEvents": [
-    "onLanguage:asp"
-  ],
-  "main": "./out/extension.js",
-  "contributes": {
-    "languages": [
-      {
-        "id": "asp",
-        "aliases": [
-          "ASP",
-          "asp"
-        ],
-        "extensions": [
-          ".asp"
-        ],
-        "configuration": "./language-configuration.json"
-      }
+    "name": "classic-asp-language-support",
+    "displayName": "Classic ASP Language Support",
+    "description": "Complete language support for Classic ASP files with formatting, IntelliSense, snippets, and auto-completion for HTML, CSS, JavaScript, and VBScript.",
+    "version": "1.0.0",
+    "icon": "icon.png",
+    "publisher": "ashtonckj",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ashtonckj/Classic-ASP-Language-Support.git"
+    },
+    "engines": {
+        "vscode": "^1.80.0"
+    },
+    "categories": [
+        "Programming Languages",
+        "Formatters",
+        "Snippets",
+        "Other"
     ],
-    "configuration": {
-      "title": "Classic ASP Formatter",
-      "properties": {
-        "aspFormatter.keywordCase": {
-          "type": "string",
-          "default": "PascalCase",
-          "enum": [
-            "lowercase",
-            "UPPERCASE",
-            "PascalCase"
-          ],
-          "enumDescriptions": [
-            "Format keywords in lowercase (if, then, end if, dim)",
-            "Format keywords in UPPERCASE (IF, THEN, END IF, DIM)",
-            "Format keywords in PascalCase (If, Then, End If, Dim)"
-          ],
-          "description": "Choose how VBScript keywords should be formatted. Note: ASP objects (Response, Request, etc.) are always formatted in PascalCase."
-        },
-        "aspFormatter.indentStyle": {
-          "type": "string",
-          "default": "spaces",
-          "enum": [
-            "spaces",
-            "tabs"
-          ],
-          "enumDescriptions": [
-            "Use spaces for indentation",
-            "Use tabs for indentation"
-          ],
-          "description": "Choose between spaces or tabs for indentation"
-        },
-        "aspFormatter.indentSize": {
-          "type": "number",
-          "default": 4,
-          "enum": [
-            2,
-            4,
-            8
-          ],
-          "description": "Number of spaces per indentation level (only applies when using spaces)"
-        },
-        "aspFormatter.prettier.printWidth": {
-          "type": "number",
-          "default": 80,
-          "description": "Prettier Setting: Maximum line length for HTML/CSS/JS code",
-          "order": 4
-        },
-        "aspFormatter.prettier.tabWidth": {
-          "type": "number",
-          "default": 4,
-          "enum": [
-            2,
-            4,
-            8
-          ],
-          "description": "Prettier Setting: Number of spaces per indentation level for HTML/CSS/JS code",
-          "order": 5
-        },
-        "aspFormatter.prettier.useTabs": {
-          "type": "boolean",
-          "default": false,
-          "description": "Prettier Setting: Use tabs instead of spaces for HTML/CSS/JS code",
-          "order": 6
-        },
-        "aspFormatter.prettier.semi": {
-          "type": "boolean",
-          "default": true,
-          "description": "Prettier Setting: Add semicolons at the end of JavaScript statements",
-          "order": 7
-        },
-        "aspFormatter.prettier.singleQuote": {
-          "type": "boolean",
-          "default": false,
-          "description": "Prettier Setting: Use single quotes instead of double quotes in JavaScript",
-          "order": 8
-        },
-        "aspFormatter.prettier.htmlWhitespaceSensitivity": {
-          "type": "string",
-          "default": "css",
-          "enum": [
-            "css",
-            "strict",
-            "ignore"
-          ],
-          "enumDescriptions": [
-            "Respect CSS display property defaults",
-            "Whitespace is considered significant",
-            "Whitespace is considered insignificant"
-          ],
-          "description": "Prettier Setting: How to handle whitespace in HTML",
-          "order": 9
+    "keywords": [
+        "asp",
+        "classic asp",
+        "vbscript",
+        "formatter",
+        "intellisense",
+        "autocomplete"
+    ],
+    "license": "MIT",
+    "activationEvents": [
+        "onLanguage:asp"
+    ],
+    "main": "./out/extension.js",
+    "contributes": {
+        "languages": [
+            {
+                "id": "asp",
+                "aliases": ["ASP", "Classic ASP", "asp"],
+                "extensions": [".asp"],
+                "configuration": "./language-configuration.json"
+            }
+        ],
+        "grammars": [
+            {
+                "language": "asp",
+                "scopeName": "text.html.asp",
+                "path": "./syntaxes/asp.tmLanguage.json",
+                "embeddedLanguages": {
+                    "text.html.basic": "html",
+                    "source.css": "css",
+                    "source.js": "javascript",
+                    "source.vbscript.embedded.asp": "vb"
+                }
+            },
+            {
+                "scopeName": "asp.injection",
+                "path": "./syntaxes/asp-injections.tmLanguage.json",
+                "injectTo": ["text.html.basic"]
+            }
+        ],
+        "snippets": [
+            {
+                "language": "asp",
+                "path": "./snippets/html.json"
+            },
+            {
+                "language": "asp",
+                "path": "./snippets/asp.json"
+            },
+            {
+                "language": "asp",
+                "path": "./snippets/javascript.json"
+            }
+        ],
+        "configuration": {
+            "title": "Classic ASP Language Support",
+            "properties": {
+                "aspFormatter.keywordCase": {
+                    "type": "string",
+                    "default": "PascalCase",
+                    "enum": ["lowercase", "UPPERCASE", "PascalCase"],
+                    "enumDescriptions": [
+                        "Format keywords in lowercase (if, then, end if, dim)",
+                        "Format keywords in UPPERCASE (IF, THEN, END IF, DIM)",
+                        "Format keywords in PascalCase (If, Then, End If, Dim)"
+                    ],
+                    "description": "Choose how VBScript keywords should be formatted",
+                    "order": 1
+                },
+                "aspFormatter.useTabs": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Indent ASP code with tabs instead of spaces",
+                    "order": 2
+                },
+                "aspFormatter.indentSize": {
+                    "type": "number",
+                    "default": 2,
+                    "enum": [2, 4, 8],
+                    "description": "Number of spaces per indentation level for ASP code (only applies when not using tabs)",
+                    "order": 3
+                },
+                "aspFormatter.prettier.printWidth": {
+                    "type": "number",
+                    "default": 80,
+                    "description": "Prettier: Maximum line length for HTML/CSS/JS code",
+                    "order": 10
+                },
+                "aspFormatter.prettier.tabWidth": {
+                    "type": "number",
+                    "default": 2,
+                    "enum": [2, 4, 8],
+                    "description": "Prettier: Number of spaces per indentation level for HTML/CSS/JS",
+                    "order": 11
+                },
+                "aspFormatter.prettier.useTabs": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Prettier: Indent HTML/CSS/JS with tabs instead of spaces",
+                    "order": 12
+                },
+                "aspFormatter.prettier.bracketSameLine": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Prettier: Put the > of multi-line HTML elements at the end of the last line instead of on a new line",
+                    "order": 13
+                },
+                "aspFormatter.prettier.semi": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Prettier: Add semicolons at the end of JavaScript statements",
+                    "order": 14
+                },
+                "aspFormatter.prettier.singleQuote": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Prettier: Use single quotes instead of double quotes in JavaScript",
+                    "order": 15
+                },
+                "aspFormatter.prettier.arrowParens": {
+                    "type": "string",
+                    "default": "always",
+                    "enum": ["always", "avoid"],
+                    "enumDescriptions": [
+                        "Always include parentheses around arrow function parameters: (x) => x",
+                        "Omit parentheses when possible: x => x"
+                    ],
+                    "description": "Prettier: Include parentheses around a sole arrow function parameter",
+                    "order": 16
+                },
+                "aspFormatter.prettier.trailingComma": {
+                    "type": "string",
+                    "default": "es5",
+                    "enum": ["none", "es5", "all"],
+                    "enumDescriptions": [
+                        "No trailing commas",
+                        "Trailing commas where valid in ES5 (objects, arrays, etc.)",
+                        "Trailing commas wherever possible (including function parameters)"
+                    ],
+                    "description": "Prettier: Print trailing commas wherever possible in JavaScript",
+                    "order": 17
+                },
+                "aspFormatter.prettier.endOfLine": {
+                    "type": "string",
+                    "default": "lf",
+                    "enum": ["lf", "crlf", "cr", "auto"],
+                    "enumDescriptions": [
+                        "Line Feed only (\\n), common on Linux and macOS",
+                        "Carriage Return + Line Feed (\\r\\n), common on Windows",
+                        "Carriage Return only (\\r), rare",
+                        "Maintain existing line endings"
+                    ],
+                    "description": "Prettier: Line ending style",
+                    "order": 18
+                },
+                "aspFormatter.prettier.htmlWhitespaceSensitivity": {
+                    "type": "string",
+                    "default": "css",
+                    "enum": ["css", "strict", "ignore"],
+                    "enumDescriptions": [
+                        "Respect the default value of CSS display property",
+                        "Whitespace is considered significant",
+                        "Whitespace is considered insignificant"
+                    ],
+                    "description": "Prettier: How to handle whitespace in HTML",
+                    "order": 19
+                },
+                "aspLanguageSupport.enableHTMLCompletion": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable HTML tag and attribute auto-completion",
+                    "order": 20
+                },
+                "aspLanguageSupport.enableCSSCompletion": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable CSS property auto-completion in <style> tags",
+                    "order": 21
+                },
+                "aspLanguageSupport.enableJSCompletion": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable JavaScript auto-completion in <script> tags",
+                    "order": 22
+                },
+                "aspLanguageSupport.enableASPCompletion": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable ASP object and VBScript keyword auto-completion",
+                    "order": 23
+                }
+            }
         }
-      }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "pretest": "npm run compile && npm run lint",
+        "lint": "eslint src --ext ts",
+        "test": "node ./out/test/runTest.js"
+    },
+    "dependencies": {
+        "prettier": "^3.8.1"
+    },
+    "devDependencies": {
+        "@types/mocha": "^10.0.10",
+        "@types/node": "16.x",
+        "@types/vscode": "^1.80.0",
+        "@typescript-eslint/eslint-plugin": "^8.53.1",
+        "@typescript-eslint/parser": "^8.53.1",
+        "eslint": "^8.41.0",
+        "typescript": "^5.0.4"
     }
-  },
-  "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
-    "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
-  },
-  "dependencies": {
-    "prettier": "^3.8.1"
-  },
-  "devDependencies": {
-    "@types/mocha": "^10.0.10",
-    "@types/node": "16.x",
-    "@types/vscode": "^1.80.0",
-    "@typescript-eslint/eslint-plugin": "^8.53.1",
-    "@typescript-eslint/parser": "^8.53.1",
-    "eslint": "^8.41.0",
-    "typescript": "^5.0.4"
-  }
 }
