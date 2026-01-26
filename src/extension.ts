@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { formatCompleteAspFile } from './formatter/htmlFormatter';
-import { HtmlCompletionProvider, registerAutoClosingTag } from './providers/htmlCompletionProvider';
+import { HtmlCompletionProvider, registerAutoClosingTag, registerEnterKeyHandler } from './providers/htmlCompletionProvider';
 import { AspCompletionProvider } from './providers/aspCompletionProvider';
 import { CssCompletionProvider } from './providers/cssCompletionProvider';
 import { JsCompletionProvider } from './providers/jsCompletionProvider';
@@ -52,6 +52,9 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register auto-closing tags
     registerAutoClosingTag(context);
+    
+    // Register Enter key handler for smart tag closing
+    registerEnterKeyHandler(context);
 
     // Add all to subscriptions
     context.subscriptions.push(

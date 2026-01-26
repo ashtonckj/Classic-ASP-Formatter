@@ -166,3 +166,80 @@ export function registerAutoClosingTag(context: vscode.ExtensionContext) {
     
     context.subscriptions.push(disposable);
 }
+
+// Register Enter key handler for auto-closing tags
+export function registerEnterKeyHandler(context: vscode.ExtensionContext) {
+    const disposable = vscode.commands.registerCommand('asp.insertLineBreak', () => {
+        const editor = vscode.window.activeTextEditor;
+        if (!editor || editor.document.languageId !== 'asp') {
+            // Fallback to default Enter behavior
+            return vscode.commands.executeCommand('default:type', { text: '\n' });
+        }
+
+        const position = editor.selection.active;
+        const line = editor.document.lineAt(position.line);
+        const textBefore = line.text.substring(0, position.character);
+        const textAfter = line.text.substring(position.character);
+
+        // Check if we just closed a tag: <html>|
+        const justClosedTagMatch = textBefore.match(/<(\w+)([^>]*)>$/);
+        
+        if (justClosedTagMatch) {
+            const tagName = justClosedTagMatch[1];
+            
+            // Check if it's not self-closing and doesn't already have a closing tag
+            if (!isSelfClosingTag(tagName)) {
+                const closingTag = `</${tagName}>`;
+                
+                // Check if closing tag already exists after cursor
+                if (!textAfter.trim().startsWith(closingTag)) {
+                    // Insert newline, indented line, and closing tag
+                    const indent = textBefore.match(/^\s*/)?.[0] || '';
+                    const tabSize = editor.options.tabSize as number || 4;
+                    const useSpaces = editor.options.insertSpaces !== false;
+                    const indentChar = useSpaces ? ' '.repeat(tabSize) : '\t';
+                    
+                    editor.edit(editBuilder => {
+                        editBuilder.insert(position, `\n${indent}${indentChar}\n${indent}${closingTag}`);
+                    }).then(() => {
+                        // Move cursor to indented position
+                        const newPosition = new vscode.Position(position.line + 1, indent.length + indentChar.length);
+                        editor.selection = new vscode.Selection(newPosition, newPosition);
+                    });
+                    return;
+                }
+            }
+        }
+
+        // Check if we're after an incomplete tag: <html|
+        const incompleteTagMatch = textBefore.match(/<(\w+)([^>]*)$/);
+        
+        if (incompleteTagMatch && !textBefore.endsWith('>')) {
+            const tagName = incompleteTagMatch[1];
+            
+            // Check if it's not self-closing
+            if (!isSelfClosingTag(tagName)) {
+                const closingTag = `</${tagName}>`;
+                const indent = textBefore.match(/^\s*/)?.[0] || '';
+                const tabSize = editor.options.tabSize as number || 4;
+                const useSpaces = editor.options.insertSpaces !== false;
+                const indentChar = useSpaces ? ' '.repeat(tabSize) : '\t';
+                
+                editor.edit(editBuilder => {
+                    // Complete the opening tag and add closing tag
+                    editBuilder.insert(position, `>\n${indent}${indentChar}\n${indent}${closingTag}`);
+                }).then(() => {
+                    // Move cursor to indented position
+                    const newPosition = new vscode.Position(position.line + 1, indent.length + indentChar.length);
+                    editor.selection = new vscode.Selection(newPosition, newPosition);
+                });
+                return;
+            }
+        }
+
+        // Default: just insert newline
+        return vscode.commands.executeCommand('default:type', { text: '\n' });
+    });
+
+    context.subscriptions.push(disposable);
+}
