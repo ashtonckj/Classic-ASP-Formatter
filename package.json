@@ -92,20 +92,20 @@
                         "Format keywords in UPPERCASE (IF, THEN, END IF, DIM)",
                         "Format keywords in PascalCase (If, Then, End If, Dim)"
                     ],
-                    "description": "Choose how VBScript keywords should be formatted",
+                    "description": "Choose how Classic ASP code keywords should be formatted",
                     "order": 1
                 },
                 "aspFormatter.useTabs": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Indent ASP code with tabs instead of spaces",
+                    "description": "Indent Classic ASP code with tabs instead of spaces",
                     "order": 2
                 },
                 "aspFormatter.indentSize": {
                     "type": "number",
                     "default": 2,
                     "enum": [2, 4, 8],
-                    "description": "Number of spaces per indentation level for ASP code (only applies when not using tabs)",
+                    "description": "Number of spaces per indentation level for Classic ASP code",
                     "order": 3
                 },
                 "aspFormatter.prettier.printWidth": {

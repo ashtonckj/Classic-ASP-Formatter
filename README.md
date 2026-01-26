@@ -41,18 +41,18 @@ end if
 ```asp
 <!DOCTYPE html>
 <html>
-    <body>
-        <div>
-            <h1>Welcome <%= username %>!</h1>
-            <%
-            Dim age
-            age = Request.Form("age")
-            If age >= 18 Then
-              Response.Write("adult")
-            End If
-            %>
-        </div>
-    </body>
+  <body>
+    <div>
+      <h1>Welcome <%=username %>!</h1>
+      <%
+      Dim age
+      age = Request.Form("age")
+      If age >= 18 Then
+        Response.Write("adult")
+      End If
+      %>
+    </div>
+  </body>
 </html>
 ```
 
@@ -60,20 +60,20 @@ end if
 
 Access settings via `File → Preferences → Settings` and search for "ASP Formatter".
 
-### ASP (VBScript) Settings
+### Classic ASP Formatter Settings
 
 | Setting | Default | Options | Description |
 |---------|---------|---------|-------------|
 | `aspFormatter.keywordCase` | `PascalCase` | `lowercase`, `UPPERCASE`, `PascalCase` | How to format VBScript keywords |
 | `aspFormatter.indentStyle` | `spaces` | `spaces`, `tabs` | Indentation style for ASP code |
-| `aspFormatter.indentSize` | `4` | `2`, `4`, `8` | Number of spaces per indent level |
+| `aspFormatter.indentSize` | `2` | `2`, `4`, `8` | Number of spaces per indent level |
 
-### Prettier (HTML/CSS/JS) Settings
+### Prettier (HTML/CSS/JS) Formatter Settings
 
 | Setting | Default | Description |
 |---------|---------|-------------|
 | `aspFormatter.prettier.printWidth` | `80` | Maximum line length |
-| `aspFormatter.prettier.tabWidth` | `4` | Spaces per indentation level |
+| `aspFormatter.prettier.tabWidth` | `2` | Spaces per indentation level |
 | `aspFormatter.prettier.useTabs` | `false` | Use tabs instead of spaces |
 | `aspFormatter.prettier.semi` | `true` | Add semicolons in JavaScript |
 | `aspFormatter.prettier.singleQuote` | `false` | Use single quotes in JavaScript |
@@ -84,8 +84,8 @@ Access settings via `File → Preferences → Settings` and search for "ASP Form
 {
   "aspFormatter.keywordCase": "PascalCase",
   "aspFormatter.indentStyle": "spaces",
-  "aspFormatter.indentSize": 4,
-  "aspFormatter.prettier.tabWidth": 4,
+  "aspFormatter.indentSize": 2,
+  "aspFormatter.prettier.tabWidth": 2,
   "aspFormatter.prettier.semi": true
 }
 ```
@@ -135,7 +135,7 @@ npm run compile
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! 
 
 ## 📄 License
 
@@ -152,5 +152,3 @@ MIT License - see [LICENSE](LICENSE) file for details
 If you encounter any issues or have suggestions, please [open an issue](https://github.com/yourusername/asp-code-formatter/issues) on GitHub.
 
 ---
-
-Made with ❤️ for the Classic ASP community
