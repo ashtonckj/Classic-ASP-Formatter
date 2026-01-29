@@ -47,7 +47,7 @@ export async function formatCompleteAspFile(code: string): Promise<string> {
     
     // Track line numbers for context awareness
     let currentLine = 0;
-    maskedCode = code.replace(/^([ \t]*)(<%[\s\S]*?%>)/gm, (match, indent, aspBlock, offset) => {
+    maskedCode = code.replace(/([ \t]*)(<%[\s\S]*?%>)/g, (match, indent, aspBlock, offset) => {
         // Calculate line number
         const textBefore = code.substring(0, offset);
         const lineNumber = textBefore.split('\n').length - 1;
@@ -85,36 +85,62 @@ export async function formatCompleteAspFile(code: string): Promise<string> {
         console.error('Prettier formatting failed:', error);
         prettifiedCode = maskedCode;
     }
-    
-    // Step 3: Combine ASP blocks virtually for formatting, then restore them
-    let restoredCode = prettifiedCode;
-
-    // Virtually combine all ASP blocks
-    const combinedAspCode = aspBlocks.map(block => block.code).join('\n');
-    const combinedFormatted = formatSingleAspBlock(combinedAspCode, aspSettings, '', false);
-
-    // Split the formatted combined code back into individual blocks
-    const formattedBlockLines = combinedFormatted.split('\n');
-    let currentLineIndex = 0;
-    const formattedBlocks: string[] = [];
+        
+    // Step 3: Separate single-line and multi-line blocks
+    const singleLineBlocks: number[] = [];
+    const multiLineBlocks: number[] = [];
 
     for (let i = 0; i < aspBlocks.length; i++) {
-        const originalBlock = aspBlocks[i];
-        const originalLineCount = originalBlock.code.split('\n').length;
-        
-        // Extract the corresponding lines from formatted combined code
-        const blockLines = formattedBlockLines.slice(currentLineIndex, currentLineIndex + originalLineCount);
-        formattedBlocks.push(blockLines.join('\n'));
-        currentLineIndex += originalLineCount;
+        const trimmed = aspBlocks[i].code.trim();
+        if ((trimmed.startsWith('<%=') || trimmed.startsWith('<% =')) && !trimmed.includes('\n')) {
+            singleLineBlocks.push(i);
+        } else if (!trimmed.includes('\n')) {
+            singleLineBlocks.push(i);
+        } else {
+            multiLineBlocks.push(i);
+        }
     }
 
-    // Restore each formatted block with its HTML indent
+    const formattedBlocks: string[] = new Array(aspBlocks.length);
+
+    // Format single-line blocks individually
+    for (const i of singleLineBlocks) {
+        formattedBlocks[i] = formatSingleAspBlock(aspBlocks[i].code, aspSettings, '', false);
+    }
+
+    // Format multi-line blocks with context if they exist
+    if (multiLineBlocks.length > 0) {
+        // Combine only multi-line blocks for context-aware formatting
+        const combinedAspCode = multiLineBlocks.map(i => aspBlocks[i].code).join('\n');
+        const combinedFormatted = formatSingleAspBlock(combinedAspCode, aspSettings, '', false);
+        
+        // Split back into individual blocks
+        const formattedBlockLines = combinedFormatted.split('\n');
+        let currentLineIndex = 0;
+        
+        for (const i of multiLineBlocks) {
+            const originalBlock = aspBlocks[i];
+            const originalLineCount = originalBlock.code.split('\n').length;
+            
+            const blockLines = formattedBlockLines.slice(currentLineIndex, currentLineIndex + originalLineCount);
+            formattedBlocks[i] = blockLines.join('\n');
+            currentLineIndex += originalLineCount;
+        }
+    }
+
+    // Step 4: Restore each formatted block with its HTML indent
+    let restoredCode = prettifiedCode;
+
     for (let i = 0; i < aspBlocks.length; i++) {
         const block = aspBlocks[i];
         const formattedBlock = formattedBlocks[i];
         
-        const placeholderRegex = new RegExp(`^([ \\t]*)<!--${block.id}-->`, 'gm');
-        const match = placeholderRegex.exec(restoredCode);
+        // Escape special regex characters in the ID
+        const escapedId = block.id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        
+        // Find the placeholder with its surrounding whitespace and indentation
+        const placeholderPattern = `([ \\t]*)<!--${escapedId}-->`;
+        const match = restoredCode.match(new RegExp(placeholderPattern));
         
         if (match) {
             const htmlIndent = match[1];
@@ -127,14 +153,15 @@ export async function formatCompleteAspFile(code: string): Promise<string> {
                 return line;
             }).join('\n');
             
+            // Replace the placeholder (without the g flag to replace only first occurrence)
             restoredCode = restoredCode.replace(
-                new RegExp(`^[ \\t]*<!--${block.id}-->`, 'gm'),
+                new RegExp(`[ \\t]*<!--${escapedId}-->`),
                 indentedBlock
             );
         } else {
-            console.warn(`Warning: Placeholder ${block.id} not found`);
+            // Fallback: just replace without indent detection
             restoredCode = restoredCode.replace(
-                new RegExp(`<!--${block.id}-->`, 'g'),
+                `<!--${block.id}-->`,
                 formattedBlock
             );
         }

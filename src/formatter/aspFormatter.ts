@@ -20,8 +20,16 @@ export function getAspSettings(): AspFormatterSettings {
 // Format a single ASP block (either <% ... %> or <%= ... %>)
 export function formatSingleAspBlock(block: string, settings: AspFormatterSettings, htmlIndent: string = '', continuesFromPrevious: boolean = false): string {
     // Check if it's an inline expression <%= %>
-    if (block.trim().startsWith('<%=')) {
-        const content = block.substring(3, block.length - 2).trim();
+    const trimmedBlock = block.trim();
+    if (trimmedBlock.startsWith('<%=') || trimmedBlock.startsWith('<% =')) {
+        // Extract content - handle both <%= and <% =
+        let content: string;
+        if (trimmedBlock.startsWith('<%=')) {
+            content = trimmedBlock.substring(3, trimmedBlock.length - 2).trim();
+        } else {
+            // <% = case - skip the space
+            content = trimmedBlock.substring(4, trimmedBlock.length - 2).trim();
+        }
         const formattedContent = applyKeywordCase(content, settings.keywordCase);
         return htmlIndent + '<%= ' + formattedContent + ' %>';
     }
