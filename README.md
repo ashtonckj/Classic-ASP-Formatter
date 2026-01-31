@@ -150,8 +150,8 @@ MIT License - see [LICENSE](LICENSE) file for details
 ## 🙏 Acknowledgments
 
 - **[Prettier](https://prettier.io/)** - HTML, CSS, and JavaScript formatting engine
-- **Zachary Becknell** ([ASP Classic Support](LINK_PLACEHOLDER)) - ASP region highlighting implementation
-- **Jintae Joo** ([Classic ASP Syntaxes and Snippets](LINK_PLACEHOLDER)) - Snippets inspiration and reference
+- **Zachary Becknell** ( [ASP Classic Support](https://github.com/zbecknell/asp-classic-support) ) - ASP region highlighting implementation
+- **Jintae Joo** ( [Classic ASP Syntaxes and Snippets](https://github.com/jtjoo/vscode-classic-asp-extension) ) - Snippets inspiration and reference
 
 ## 📮 Support
 
