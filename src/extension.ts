@@ -4,9 +4,13 @@ import { HtmlCompletionProvider, registerAutoClosingTag, registerEnterKeyHandler
 import { AspCompletionProvider } from './providers/aspCompletionProvider';
 import { CssCompletionProvider } from './providers/cssCompletionProvider';
 import { JsCompletionProvider } from './providers/jsCompletionProvider';
+import { addRegionHighlights } from './highlight';
 
 export function activate(context: vscode.ExtensionContext) {
     console.log('Classic ASP Language Support is now active!');
+
+    // Add ASP region highlighting
+    addRegionHighlights(context);
 
     // Register formatter
     const formatter = vscode.languages.registerDocumentFormattingEditProvider('asp', {
@@ -52,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     // Register auto-closing tags
     registerAutoClosingTag(context);
-    
+
     // Register Enter key handler for smart tag closing
     registerEnterKeyHandler(context);
 

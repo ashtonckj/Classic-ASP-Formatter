@@ -2,6 +2,11 @@ import { ExtensionContext, Range, TextEditorDecorationType, window, workspace } 
 import { getAspRegions } from "./region";
 
 export function addRegionHighlights(context: ExtensionContext) {
+	// Declare all variables at the top of the function
+	let timeout: NodeJS.Timeout | null = null;
+	let bracketDecorationType: TextEditorDecorationType;
+	let codeBlockDecorationType: TextEditorDecorationType;
+	let configurationDidChange = false;
 
 	let activeEditor = window.activeTextEditor;
 	if (activeEditor) {
@@ -26,16 +31,12 @@ export function addRegionHighlights(context: ExtensionContext) {
 		}
 	}, null, context.subscriptions);
 
-	let timeout: NodeJS.Timeout | null = null;
 	function triggerUpdateDecorations() {
 		if (timeout) {
 			clearTimeout(timeout);
 		}
 		timeout = setTimeout(updateDecorations, 200);
 	}
-
-	let bracketDecorationType: TextEditorDecorationType;
-	let codeBlockDecorationType: TextEditorDecorationType;
 
 	function setDecorationTypes() {
 		const aspConfig = workspace.getConfiguration("aspLanguageSupport");
@@ -64,12 +65,10 @@ export function addRegionHighlights(context: ExtensionContext) {
 		});
 	}
 
-	let configurationDidChange = false;
-
 	function updateDecorations() {
-        if (!activeEditor) {
-            return;
-        }
+		if (!activeEditor) {
+			return;
+		}
 
 		const aspConfig = workspace.getConfiguration("aspLanguageSupport");
 		const highlightAspRegions: boolean = aspConfig.get<boolean>("highlightAspRegions", true);
@@ -80,8 +79,12 @@ export function addRegionHighlights(context: ExtensionContext) {
 		}
 
 		if(configurationDidChange || !highlightAspRegions) {
-			bracketDecorationType.dispose();
-			codeBlockDecorationType.dispose();
+			if (bracketDecorationType) {
+				bracketDecorationType.dispose();
+			}
+			if (codeBlockDecorationType) {
+				codeBlockDecorationType.dispose();
+			}
 			setDecorationTypes();
 
 			configurationDidChange = false;
@@ -93,7 +96,7 @@ export function addRegionHighlights(context: ExtensionContext) {
 
 		const regions = getAspRegions(activeEditor.document);
 
-		if (!regions) {
+		if (!regions || regions.length === 0) {
 			return;
 		}
 
