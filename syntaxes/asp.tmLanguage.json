@@ -98,7 +98,7 @@
             "patterns": [
                 {
                     "name": "string.quoted.double.sql.vbscript",
-                    "begin": "\"(?=(SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|FROM|WHERE|JOIN|ORDER BY|GROUP BY))",
+                    "begin": "\"(?=.*\\b(?i)(SELECT|INSERT|UPDATE|DELETE|CREATE|DROP|ALTER|FROM|WHERE|JOIN|ORDER|GROUP|AND|OR|SET|HAVING|UNION|VALUES|INTO|ON|INNER|LEFT|RIGHT|OUTER|DISTINCT|TOP|AS|LIKE|BETWEEN|IN|EXISTS|CASE)\\b)",
                     "end": "\"",
                     "beginCaptures": {
                         "0": {
@@ -117,15 +117,23 @@
                         },
                         {
                             "name": "keyword.other.DML.sql",
-                            "match": "\\b(?i)(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|JOIN|INNER|LEFT|RIGHT|OUTER|ON|ORDER BY|GROUP BY|HAVING|DISTINCT|TOP|AS)\\b"
+                            "match": "\\b(?i)(SELECT|INSERT|UPDATE|DELETE|FROM|WHERE|JOIN|INNER|LEFT|RIGHT|OUTER|FULL|CROSS|ON|ORDER\\s+BY|GROUP\\s+BY|HAVING|DISTINCT|TOP|AS|UNION|ALL)\\b"
                         },
                         {
                             "name": "keyword.other.DDL.sql",
-                            "match": "\\b(?i)(CREATE|DROP|ALTER|TABLE|INDEX|VIEW|DATABASE)\\b"
+                            "match": "\\b(?i)(CREATE|DROP|ALTER|TABLE|INDEX|VIEW|DATABASE|PROCEDURE|TRIGGER)\\b"
                         },
                         {
                             "name": "keyword.other.sql",
-                            "match": "\\b(?i)(AND|OR|NOT|IN|LIKE|BETWEEN|IS|NULL|ASC|DESC|SET|VALUES)\\b"
+                            "match": "\\b(?i)(AND|OR|NOT|IN|LIKE|BETWEEN|IS|NULL|ASC|DESC|SET|VALUES|INTO|EXISTS|CASE|WHEN|THEN|ELSE|END)\\b"
+                        },
+                        {
+                            "name": "storage.type.sql",
+                            "match": "\\b(?i)(VARCHAR|INT|INTEGER|CHAR|TEXT|DATE|DATETIME|FLOAT|DECIMAL|BIT|NVARCHAR|BIGINT|SMALLINT|TINYINT)\\b"
+                        },
+                        {
+                            "name": "support.function.sql",
+                            "match": "\\b(?i)(COUNT|SUM|AVG|MAX|MIN|GETDATE|CONVERT|CAST|ISNULL|COALESCE|LEN|SUBSTRING|UPPER|LOWER|TRIM|LTRIM|RTRIM)\\b"
                         },
                         {
                             "name": "constant.numeric.sql",
